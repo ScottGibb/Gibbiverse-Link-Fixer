@@ -1,4 +1,5 @@
-import re, os
+import re
+import os
 import yaml
 from pathlib import Path
 from argparse import ArgumentParser
