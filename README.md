@@ -1,6 +1,7 @@
 # Gibbiverse Link Fixer
 
 [![MegaLinter](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/actions/workflows/mega-linter.yaml/badge.svg)](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/actions/workflows/mega-linter.yaml)
+
 ![Languages and Tools](./docs/Languages%20and%20Tools.drawio.svg)
 
 Utilities to clean and enrich Markdown in the Gibbiverse blog content.
