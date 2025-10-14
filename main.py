@@ -90,6 +90,7 @@ def add_tags_to_file(filepath: Path):
     found = []
     body_lower = text.lower()
     for topic in topic_entries:
+        topic = " " + topic + " "  # Add Whitespace around Topics
         if topic.lower() in body_lower and topic not in tags and topic not in found:
             found.append(topic)
 
