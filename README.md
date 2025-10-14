@@ -33,26 +33,11 @@ It’s designed to be run locally or in CI before publishing.
 
 You can run with the system Python or create a virtual environment. With uv or pip:
 
-Using pip:
+Using uv:
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -r <(python -c 'import tomllib,sys;print("\n".join(tomllib.load(open("pyproject.toml","rb"))["project"]["dependencies"]))')
-```
-
-Using uv (optional):
-
-```bash
-uv venv
-source .venv/bin/activate
-uv pip install -e .
-```
-
-Alternatively, install via editable mode:
-
-```bash
-pip install -e .
+uv sync
+uv run main.py
 ```
 
 ## Usage
@@ -72,44 +57,6 @@ Notes:
 - If a link text (alias) exists in `links.yaml`, the script will replace `[alias]()` or invalid `[alias](broken)` with `[alias](real_url)`
 - `topics.txt` entries found in the body are merged into frontmatter `tags`
 
-## Examples
-
-Given this input:
-
-```md
-This is an [Obsidian]() note. See [GitHub](https://github.com/).
-
----
-tags: [blog]
----
-
-We mention embedded rust here.
-```
-
-And:
-
-```yaml
-# links.yaml
-Obsidian: https://obsidian.md/
-```
-
-```txt
-# topics.txt
-embedded rust
-```
-
-The output becomes:
-
-```md
-This is an [Obsidian](https://obsidian.md/) note. See [GitHub](https://github.com/).
-
----
-tags: [blog, embedded rust]
----
-
-We mention embedded rust here.
-```
-
 ## CI
 
 MegaLinter runs on pushes and PRs (see `.github/workflows/mega-linter.yaml`) with the Python flavor. It lints/auto-formats:
@@ -117,13 +64,3 @@ MegaLinter runs on pushes and PRs (see `.github/workflows/mega-linter.yaml`) wit
 - Markdown (markdownlint, link check, table formatter)
 - YAML, JSON
 - Python (ruff + ruff format)
-
-## Troubleshooting
-
-- Missing dependencies: ensure you’re using Python 3.12+ and installed dependencies from `pyproject.toml`
-- Paths: `--path`, `--links`, and `--topics` are resolved relative to where you run `python main.py`. Use absolute paths if needed.
-- Link replacement: only aliases present as keys in `links.yaml` are replaced.
-
-## License
-
-MIT (see repository root license if present).
