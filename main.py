@@ -5,12 +5,25 @@ from argparse import ArgumentParser
 
 # Set up argument parser
 parser = ArgumentParser(description="Clean Markdown links.")
-parser.add_argument("--path", type=Path, help="Root directory containing Markdown files.", default="../")
-parser .add_argument("--links", type=Path, help="Path to a file containing valid links (one per line).", default="../links.yaml")
-parser .add_argument("--topics", type=Path, help="Path to a file containing valid topics (one per line).", default="../topics.txt")
+parser.add_argument(
+    "--path", type=Path, help="Root directory containing Markdown files.", default="../"
+)
+parser.add_argument(
+    "--links",
+    type=Path,
+    help="Path to a file containing valid links (one per line).",
+    default="../links.yaml",
+)
+parser.add_argument(
+    "--topics",
+    type=Path,
+    help="Path to a file containing valid topics (one per line).",
+    default="../topics.txt",
+)
 BLOG_DIR = parser.parse_args().path
 LINKS_DIR = parser.parse_args().links
 TOPICS_DIR = parser.parse_args().topics
+
 
 # Open Links Database
 with open(LINKS_DIR, "r", encoding="utf-8") as f:
@@ -21,13 +34,15 @@ with open(TOPICS_DIR, "r", encoding="utf-8") as f:
     topic_entries = [line.strip() for line in f if line.strip()]
 
 # Regex to find markdown links
-LINK_PATTERN = re.compile(r'\[([^\]]+)\]\(([^)]*)\)')
+LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]*)\)")
+
 
 def process_link(text_part: str) -> str:
     if text_part in link_entries:
         print(f"🔗 Replacing '{text_part}' with link from {LINKS_DIR}")
         text_part = "[{}]({})".format(text_part, link_entries[text_part])
     return text_part
+
 
 def clean_links_in_file(filepath: Path):
     text = filepath.read_text(encoding="utf-8")
@@ -42,7 +57,9 @@ def clean_links_in_file(filepath: Path):
             return process_link(text_part)
 
         # Case 2: External to blog folder (example heuristic)
-        if not os.path.isfile(url) and not url.startswith(("/", "#", "http://", "https://")):
+        if not os.path.isfile(url) and not url.startswith(
+            ("/", "#", "http://", "https://")
+        ):
             print(f"🚫 Removing external link '{url}' in {filepath}")
             return process_link(text_part)
         # Otherwise, keep link
@@ -53,6 +70,7 @@ def clean_links_in_file(filepath: Path):
     # Only overwrite if changes
     if new_text != text:
         filepath.write_text(new_text, encoding="utf-8")
+
 
 def add_tags_to_file(filepath: Path):
     text = filepath.read_text(encoding="utf-8")
@@ -67,7 +85,7 @@ def add_tags_to_file(filepath: Path):
     elif not isinstance(tags, list):
         tags = []
 
-    body = text[front_match.end():]
+    body = text[front_match.end() :]
     found = []
     body_lower = text.lower()
     for topic in topic_entries:
@@ -83,6 +101,7 @@ def add_tags_to_file(filepath: Path):
     filepath.write_text(f"---\n{new_front}\n---\n{body}", encoding="utf-8")
     print(f"🏷️ Added tags {found} to {filepath}")
 
+
 def main():
     print("Starting link cleanup...")
     for md_file in BLOG_DIR.rglob("*.md"):
@@ -90,6 +109,7 @@ def main():
         clean_links_in_file(md_file)
         add_tags_to_file(md_file)
     print("Link cleanup completed.")
+
 
 if __name__ == "__main__":
     main()
