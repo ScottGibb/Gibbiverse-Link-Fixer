@@ -60,13 +60,32 @@ def find_topics(topics: list[str], markdown_content: str):
 def update_frontmatter(md_path: Path, topics: list[str]):
     try:
         logger.info(f"Opening markdown file: {md_path}")
+        # Read the file contents first (don't open with "w" which truncates)
         with md_path.open("r", encoding="utf-8") as f:
             content = f.read()
-            found_topics = find_topics(topics, content)
-            # Update YAML front matter
-            ## TODO: Implement front matter update logic here
+
+        found_topics = find_topics(topics, content)
+
+        # Split into lines preserving line endings so we can modify and write back
+        lines = content.splitlines(keepends=True)
+        for idx, line in enumerate(lines):
+            if line.startswith("tags:"):
+                indent = line[: len(line) - len(line.lstrip())]
+                if found_topics:
+                    new_lines = [f"{indent}tags:\n"] + [f"{indent}\t- {t}\n" for t in found_topics]
+                lines[idx: idx + 1] = new_lines
+                break
+        else:
+            # If no tags line found, append one
+            lines.append(f"tags: {found_topics}\n")
+
+        # Write the modified content back
+        with md_path.open("w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        logger.info(f"Updated tags in {md_path} to {found_topics}")
     except Exception:
-        logger.exception(f"Failed to read {md_path}")      
+        logger.exception(f"Failed to read {md_path}")
 
 def main():
     logger.info("Starting Link Fixer...")
