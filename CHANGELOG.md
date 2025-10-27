@@ -2,11 +2,9 @@
 
 ## [0.2.0](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/compare/v0.1.0...v0.2.0) (2025-10-27)
 
-
 ### Features
 
 * :fire: WIP Feature for V0.2.0 ([b36ef8d](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/commit/b36ef8de0a6d232274cb30a8aefe65dae25f83f5))
-
 
 ### Bug Fixes
 
