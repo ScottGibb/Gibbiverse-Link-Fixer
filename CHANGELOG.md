@@ -2,7 +2,6 @@
 
 ## 0.1.0 (2025-10-27)
 
-
 ### Bug Fixes
 
 * Actual First ([f010d1b](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/commit/f010d1bd3b65829082eb882defafe910a0d5c2b4))
