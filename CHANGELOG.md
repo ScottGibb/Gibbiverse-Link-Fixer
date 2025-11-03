@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/compare/v0.1.0...v0.2.0) (2025-11-03)
+
+
+### Features
+
+* :fire: WIP Feature for V0.2.0 ([b36ef8d](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/commit/b36ef8de0a6d232274cb30a8aefe65dae25f83f5))
+* Attempt at adding wiki link handling ([8955953](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/commit/8955953dcb77e280e2e20c55da96f8e4ccf55609))
+
+
+### Bug Fixes
+
+* Attempt to fix Update fontmatter more work required to make it work ([2fcd35d](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/commit/2fcd35d462d6944e3f13e9a7fb78911a027baa30))
+
 ## 0.1.0 (2025-10-27)
 
 ### Bug Fixes
