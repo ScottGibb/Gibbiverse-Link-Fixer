@@ -18,13 +18,13 @@ parser.add_argument(
     "--links",
     type=Path,
     help="Path to a file containing valid links (one per line).",
-    required=True,
+    # required=True,
 )
 parser.add_argument(
     "--topics",
     type=Path,
     help="Path to a file containing valid topics (one per line).",
-    required=True,
+    # required=True,
 )
 BLOG_DIR = parser.parse_args().path
 LINKS_FILE_PATH = parser.parse_args().links
@@ -57,41 +57,100 @@ def find_topics(topics: list[str], markdown_content: str):
     return found_topics
 
 
-def update_frontmatter(md_path: Path, topics: list[str]):
-    try:
-        logger.info(f"Opening markdown file: {md_path}")
-        # Read the file contents first (don't open with "w" which truncates)
-        with md_path.open("r", encoding="utf-8") as f:
-            content = f.read()
+def read_markdown_with_frontmatter(path):
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
 
-        found_topics = find_topics(topics, content)
-
-        # Split into lines preserving line endings so we can modify and write back
-        lines = content.splitlines(keepends=True)
-        for idx, line in enumerate(lines):
-            if line.startswith("tags:"):
-                indent = line[: len(line) - len(line.lstrip())]
-                if found_topics:
-                    new_lines = [f"{indent}tags:\n"] + [f"{indent}\t- {t}\n" for t in found_topics]
-                lines[idx: idx + 1] = new_lines
-                break
+    if content.startswith("---"):
+        # Split the front matter from the body
+        parts = content.split("---", 2)
+        if len(parts) >= 3:
+            _, frontmatter, body = parts
         else:
-            # If no tags line found, append one
-            lines.append(f"tags: {found_topics}\n")
+            frontmatter, body = "", content
+    else:
+        frontmatter, body = "", content
 
-        # Write the modified content back
-        with md_path.open("w", encoding="utf-8") as f:
-            f.writelines(lines)
+    # Parse YAML
+    yaml_data = yaml.safe_load(frontmatter) if frontmatter.strip() else {}
 
-        logger.info(f"Updated tags in {md_path} to {found_topics}")
-    except Exception:
-        logger.exception(f"Failed to read {md_path}")
+    return yaml_data, body.strip()
 
+def write_markdown_with_frontmatter(path, yaml_data, body):
+    frontmatter = yaml.dump(yaml_data, sort_keys=False)
+    new_content = f"---\n{frontmatter}---\n\n{body}\n"
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(new_content)
+
+def update_frontmatter(md_path: Path, topics: list[str]):
+    font_matter, body = read_markdown_with_frontmatter(md_path)
+    topics = find_topics(topics, body)
+    current_topics = font_matter["tags"] if "tags" in font_matter else []
+
+    if current_topics is not None:
+        for topic in topics:
+            if topic not in current_topics:
+                current_topics.append(topic)
+    else:
+        current_topics = topics
+    font_matter["tags"] = current_topics
+    write_markdown_with_frontmatter(md_path, font_matter, body)
+
+def change_wiki_links_to_markdown_links(md_path: Path, valid_links: list[str]):
+    with open(md_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    for link in valid_links:
+        wiki_link = f"[[{link}]]"
+        markdown_link = f"[{link}]({valid_links[link]})"
+        if wiki_link.lower() in content.lower():
+            content = content.replace(wiki_link, markdown_link)
+            logger.info(f"Replaced '{wiki_link}' with '{markdown_link}' in {md_path}")
+
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+import re
+from pathlib import Path
+
+def replace_known_wikilinks_with_md_links(md_path: Path, blog_dir: Path):
+    """Replace [[WikiLinks]] that match existing markdown files with [text](relative/path.md)."""
+    
+    # Step 1: Build a map from stem name -> full path
+    known_posts = {p.stem: p for p in blog_dir.rglob("*.md")}
+
+    # Step 2: Read file content
+    content = md_path.read_text(encoding="utf-8")
+
+    # Step 3: Regex to match [[WikiLinks]]
+    wikilink_pattern = re.compile(r"\[\[([^\]]+)\]\]")
+
+    # Step 4: Replacement logic
+    def replace_link(match):
+        link_name = match.group(1).strip()
+        target_name = Path(link_name).name
+
+        # Only replace if there's a corresponding markdown file
+        if target_name in known_posts:
+            target_path = known_posts[target_name]
+            return f"[{target_name}](.{target_path.as_posix().removeprefix(str(blog_dir.as_posix()))})"
+        
+        # Otherwise leave as-is
+        return match.group(0)
+
+    # Step 5: Apply replacements
+    new_content = wikilink_pattern.sub(replace_link, content)
+
+    # Step 6: Write updated content
+    md_path.write_text(new_content, encoding="utf-8")
+        
 def main():
     logger.info("Starting Link Fixer...")
     links, topics = build_dictionaries()
     for md_path in BLOG_DIR.rglob("*.md"):
         update_frontmatter(md_path, topics)
+        change_wiki_links_to_markdown_links(md_path, links)
+        replace_known_wikilinks_with_md_links(md_path, BLOG_DIR)
     logger.info("Link fixer completed.")
 
 
