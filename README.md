@@ -4,7 +4,13 @@
 
 ![Languages and Tools](./docs/Languages%20and%20Tools.drawio.svg)
 
-Utilities to clean and enrich Markdown in the Gibbiverse blog content.
+# **Deprecated**
+
+Upon many attempts to have a neat workflow between Obsidian and Hugo, I couldn't get the links to work correctly without a lot of hassle. This resulted in me abandoning the project and just going with a Blog Repository and an Obsidian Repository.
+
+
+
+## Summary 
 
 This tool scans a directory of Markdown files to:
 
