@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/compare/v0.2.0...v0.3.0) (2025-11-03)
+
+
+### Features
+
+* Add deprecation notice and project summary ([7d8a540](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/commit/7d8a54021c4aa5102c09fc6e8c6b6201d0f217c3))
+
 ## [0.2.0](https://github.com/ScottGibb/Gibbiverse-Link-Fixer/compare/v0.1.0...v0.2.0) (2025-11-03)
 
 
